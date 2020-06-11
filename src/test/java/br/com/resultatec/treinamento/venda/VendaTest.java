@@ -1,5 +1,6 @@
 package br.com.resultatec.treinamento.venda;
 
+import br.com.resultatec.treinamento.exception.AtualizarEstoqueQuantidadeNegativaException;
 import br.com.resultatec.treinamento.exception.LimiteCreditoException;
 import br.com.resultatec.treinamento.exception.VendaException;
 import br.com.resultatec.treinamento.model.Cliente;
@@ -31,6 +32,22 @@ public class VendaTest {
         String retorno = exception.getMessage();
 
         Assert.isTrue(retorno.equals("Não é permitido adicionar quantidade zerada ao carrinho"),"Mensagem esperada: Não é permitido adicionar quantidade zerada ao carrinho: "+retorno);
+
+    }
+
+    @Test
+    public void quantidadeDeCompraNegativaTest(){
+        cliente.setLimiteCredito(10);
+        produto.setValorVenda(10);
+        produto.setEstoque(10);
+
+        AtualizarEstoqueQuantidadeNegativaException exception = assertThrows(AtualizarEstoqueQuantidadeNegativaException.class, () -> {
+            venda.adicionarProdutoAoCarrinho(produto, -2);
+        });
+
+        String retorno = exception.getMessage();
+
+        Assert.isTrue(retorno.equals("Não é permitido atualizar o estoque do produto com valor negativo."), "Esperado a mensagem: Não é permitido atualizar o estoque do produto com valor negativo. : "+retorno);
 
     }
 

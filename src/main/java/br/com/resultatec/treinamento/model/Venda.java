@@ -2,9 +2,7 @@ package br.com.resultatec.treinamento.model;
 
 import br.com.resultatec.treinamento.crediario.ControleCredito;
 import br.com.resultatec.treinamento.estoque.ControleEstoque;
-import br.com.resultatec.treinamento.exception.ControleEstoqueException;
-import br.com.resultatec.treinamento.exception.LimiteCreditoException;
-import br.com.resultatec.treinamento.exception.VendaException;
+import br.com.resultatec.treinamento.exception.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,13 +21,14 @@ public class Venda {
         this.setProdutos(new ArrayList());
     }
 
-    public void adicionarProdutoAoCarrinho(Produto produto, double quantidadeDeCompra) throws VendaException, LimiteCreditoException, ControleEstoqueException {
+    public void adicionarProdutoAoCarrinho(Produto produto, double quantidadeDeCompra) throws VendaException, LimiteCreditoException, EstoqueInsuficienteException, AtualizarEstoqueQuantidadeNegativaException {
 
         if (produto == null ) throw new VendaException("É obrigatório preencher um produto para adicioar ao carrinho");
         if (quantidadeDeCompra == BigDecimal.ZERO.doubleValue()) throw new VendaException("Não é permitido adicionar quantidade zerada ao carrinho");
 
         controleCredito.atualizaLimiteCreditoCliente(getCliente(), produto);
-        controleEstoque.baixarEstoque(produto, quantidadeDeCompra);
+        controleEstoque.saidaEstoque(produto, quantidadeDeCompra);
+
         this.getProdutos().add(produto);
     }
 

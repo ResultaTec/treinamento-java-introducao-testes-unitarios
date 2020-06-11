@@ -1,26 +1,21 @@
 package br.com.resultatec.treinamento.estoque;
 
-import br.com.resultatec.treinamento.exception.ControleEstoqueException;
+import br.com.resultatec.treinamento.exception.AtualizarEstoqueQuantidadeNegativaException;
+import br.com.resultatec.treinamento.exception.EstoqueInsuficienteException;
 import br.com.resultatec.treinamento.model.Produto;
 
-import java.math.BigDecimal;
 
 public class ControleEstoque {
 
-    public void baixarEstoque(Produto produto, Double quantidadeParaDarBaixa) throws ControleEstoqueException {
-        if (produtoTemEstoqueDisponivelParaConsumo(produto, quantidadeParaDarBaixa)){
-            produto.setEstoque(produto.getEstoque() - quantidadeParaDarBaixa);
-        }
+    public void saidaEstoque(Produto produto, Double quantidadeParaDarBaixa) throws EstoqueInsuficienteException, AtualizarEstoqueQuantidadeNegativaException {
+        if (quantidadeParaDarBaixa < 0) throw new AtualizarEstoqueQuantidadeNegativaException("Não é permitido atualizar o estoque do produto com valor negativo.");
+
+        produto.saidaEstoque(quantidadeParaDarBaixa);
     }
 
-    private Boolean produtoTemEstoqueDisponivelParaConsumo(Produto produto, Double quantidadeParaDarBaixa) throws ControleEstoqueException {
-        if (!produtoTemEstoqueDisponivel(produto))  throw new ControleEstoqueException("Produto com estoque zerado");
-        if (produto.getEstoque() - quantidadeParaDarBaixa < BigDecimal.ZERO.doubleValue()) throw new ControleEstoqueException("Produto não possui estoque o suficiente para compras");
-        else return Boolean.TRUE;
-    }
+    public void entradaEstoque(Produto produto, Double quantidadeParaDarEntrada) throws AtualizarEstoqueQuantidadeNegativaException {
+        if (quantidadeParaDarEntrada < 0) throw new AtualizarEstoqueQuantidadeNegativaException("Não é permitido atualizar o estoque do produto com valor negativo.");
 
-    private Boolean produtoTemEstoqueDisponivel(Produto produto) throws ControleEstoqueException {
-        if (produto.getEstoque() > BigDecimal.ZERO.doubleValue()) return Boolean.TRUE;
-        else  throw new ControleEstoqueException("Produto com estoque zerado");
+        produto.entradaEstoque(produto, quantidadeParaDarEntrada);
     }
 }

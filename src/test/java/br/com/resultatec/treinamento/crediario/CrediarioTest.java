@@ -1,8 +1,6 @@
 package br.com.resultatec.treinamento.crediario;
 
-import br.com.resultatec.treinamento.exception.ControleEstoqueException;
-import br.com.resultatec.treinamento.exception.LimiteCreditoException;
-import br.com.resultatec.treinamento.exception.VendaException;
+import br.com.resultatec.treinamento.exception.*;
 import br.com.resultatec.treinamento.model.Cliente;
 import br.com.resultatec.treinamento.model.Produto;
 import br.com.resultatec.treinamento.model.Venda;
@@ -51,7 +49,7 @@ public class CrediarioTest {
     }
 
     @Test
-    public void verificaSeAtualizouCreditoDoClienteAposCompras() throws LimiteCreditoException, ControleEstoqueException, VendaException {
+    public void verificaSeAtualizouCreditoDoClienteAposCompras() throws LimiteCreditoException, EstoqueInsuficienteException, VendaException, AtualizarEstoqueQuantidadeNegativaException {
         cliente.setLimiteCredito(10);
         produto.setValorVenda(5);
         produto.setEstoque(1);

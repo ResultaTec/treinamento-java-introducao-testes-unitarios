@@ -1,8 +1,6 @@
 package br.com.resultatec.treinamento.estoque;
 
-import br.com.resultatec.treinamento.exception.ControleEstoqueException;
-import br.com.resultatec.treinamento.exception.LimiteCreditoException;
-import br.com.resultatec.treinamento.exception.VendaException;
+import br.com.resultatec.treinamento.exception.*;
 import br.com.resultatec.treinamento.model.Cliente;
 import br.com.resultatec.treinamento.model.Produto;
 import br.com.resultatec.treinamento.model.Venda;
@@ -21,13 +19,13 @@ public class ControleEstoqueTest {
     Produto produto = new Produto();
 
     @Test
-    public void naoPermiteComprarProdutosMaiorQueOhEstoqueDisponivel() {
+    public void estoqueInsuficienteTest() {
 
         cliente.setLimiteCredito(10);
         produto.setValorVenda(10);
         produto.setEstoque(1);
 
-        ControleEstoqueException exception = assertThrows(ControleEstoqueException.class, () -> {
+        EstoqueInsuficienteException exception = assertThrows(EstoqueInsuficienteException.class, () -> {
             venda.adicionarProdutoAoCarrinho(produto, 2);
         });
 
@@ -37,38 +35,33 @@ public class ControleEstoqueTest {
     }
 
     @Test
-    public void naoPermiteCompraDeProdutoComEstoqueZerado() {
-
-        cliente.setLimiteCredito(10);
-        produto.setValorVenda(10);
-        produto.setEstoque(0);
-
-        ControleEstoqueException exception = assertThrows(ControleEstoqueException.class, () -> {
-            venda.adicionarProdutoAoCarrinho(produto, 2);
-        });
-
-        String retorno = exception.getMessage();
-
-        Assert.isTrue(retorno.equals("Produto com estoque zerado"), "Esperado a mensagem: Produto com estoque zerado : "+retorno);
-    }
-
-    @Test
-    public void naoPermiteCompraDeProdutoComEstoqueNegativo() {
+    public void compraEstoqueNegativoTest() {
         cliente.setLimiteCredito(10);
         produto.setValorVenda(10);
         produto.setEstoque(-1);
 
-        ControleEstoqueException exception = assertThrows(ControleEstoqueException.class, () -> {
+        EstoqueInsuficienteException exception = assertThrows(EstoqueInsuficienteException.class, () -> {
             venda.adicionarProdutoAoCarrinho(produto, 2);
         });
 
         String retorno = exception.getMessage();
 
-        Assert.isTrue(retorno.equals("Produto com estoque zerado"), "Esperado a mensagem: Produto com estoque zerado : "+retorno);
+        Assert.isTrue(retorno.equals("Produto não possui estoque o suficiente para compras"), "Esperado a mensagem: Produto não possui estoque o suficiente para compras : "+retorno);
     }
 
     @Test
-    public void atualizouEstoqueAposACompra() throws ControleEstoqueException, LimiteCreditoException, VendaException {
+    public void compraComEstoqueNegativoConfirmadoNoProdutoTest() throws EstoqueInsuficienteException, LimiteCreditoException, VendaException, AtualizarEstoqueQuantidadeNegativaException {
+        cliente.setLimiteCredito(10);
+        produto.setValorVenda(10);
+        produto.setEstoque(0);
+        produto.setPermiteEstoqueNegativo(true);
+        venda.adicionarProdutoAoCarrinho(produto, 2);
+
+        Assert.isTrue(produto.getEstoque()==-2,"Esperado -3 retornou "+produto.getEstoque());
+    }
+
+    @Test
+    public void atualizarEstoqueProdutoCompraTest() throws EstoqueInsuficienteException, LimiteCreditoException, VendaException, AtualizarEstoqueQuantidadeNegativaException {
         cliente.setLimiteCredito(10);
         produto.setValorVenda(10);
         produto.setEstoque(4);
